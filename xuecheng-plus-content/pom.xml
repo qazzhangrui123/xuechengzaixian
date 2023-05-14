@@ -6,6 +6,7 @@
     <artifactId>xuecheng-plus-content</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>xuecheng-plus-content</name>
+    <packaging>pom</packaging>
     <description>xuecheng-plus-content</description>
     <parent>
         <groupId>com.xuecheng</groupId>

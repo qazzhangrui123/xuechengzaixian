@@ -9,9 +9,8 @@
     <description>xuecheng-plus-content-api</description>
     <parent>
         <groupId>com.xuecheng</groupId>
-        <artifactId>xuecheng-plus-parent</artifactId>
+        <artifactId>xuecheng-plus-content</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../../xuecheng-plus-parent</relativePath>
     </parent>
     <properties>
         <java.version>1.8</java.version>
@@ -80,6 +79,12 @@
         <dependency>
             <groupId>com.xuecheng</groupId>
             <artifactId>xuecheng-plus-base</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.xuecheng</groupId>
+            <artifactId>xuecheng-plus-content-service</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>

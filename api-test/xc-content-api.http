@@ -1,0 +1,15 @@
+###
+GET http://localhost:8080/payment/get/{{id}}
+
+###
+GET http://localhost:8001/get/{{id}}
+
+### 查询课程信息
+POST {{content_host}}/content/course/list?pageNo=1&pageSize=2
+Content-Type: application/json
+
+{
+  "auditStatus": "202004",
+  "courseName": "",
+  "publishStatus": ""
+}
