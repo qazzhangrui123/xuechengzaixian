@@ -1,10 +1,10 @@
 #微服务配置
 spring:
   application:
-    name: content-api
+    name: content-service
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/xc_content?serverTimezone=UTC&userUnicode=true&useSSL=false&
+    url: jdbc:mysql://localhost:3306/xc_content?serverTimezone=UTC&userUnicode=true&useSSL=false
     username: root
     password: 123456
 # 日志文件配置路径

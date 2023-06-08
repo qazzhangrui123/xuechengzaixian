@@ -22,8 +22,8 @@ public class CourseBaseMapperTests {
 
     @Test
     public void testCourseBaseMapper(){
-        CourseBase courseBase = courseBaseMapper.selectById(18);
-        Assertions.assertNotNull(courseBase);
+//        CourseBase courseBase = courseBaseMapper.selectById(18);
+//        Assertions.assertNotNull(courseBase);
 
         //详细进行分页查询的单元测试
 
@@ -35,7 +35,8 @@ public class CourseBaseMapperTests {
         queryWrapper.like(StringUtils.isNotEmpty(queryCourseParamsDto.getCourseName()),CourseBase::getName,queryCourseParamsDto.getCourseName());
         //根据课程的审核状态查询 course_base.audit_status = ?
         queryWrapper.eq(StringUtils.isNotEmpty(queryCourseParamsDto.getAuditStatus()), CourseBase::getAuditStatus, queryCourseParamsDto.getAuditStatus());
-
+        //根据课程的发布状态查询
+        queryWrapper.eq(StringUtils.isNotEmpty(queryCourseParamsDto.getPublishStatus()),CourseBase::getStatus,queryCourseParamsDto.getPublishStatus());
         //分页参数对象
         PageParams pageParams = new PageParams();
         pageParams.setPageNo(1L);

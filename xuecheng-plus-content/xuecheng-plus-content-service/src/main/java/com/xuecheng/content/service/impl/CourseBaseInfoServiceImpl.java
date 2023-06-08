@@ -21,6 +21,12 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
     @Autowired
     CourseBaseMapper courseBaseMapper;
 
+    /**
+     * 课程分页查询
+     * @param pageParams
+     * @param queryCourseParamsDto
+     * @return
+     */
     @Override
     public PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto) {
 

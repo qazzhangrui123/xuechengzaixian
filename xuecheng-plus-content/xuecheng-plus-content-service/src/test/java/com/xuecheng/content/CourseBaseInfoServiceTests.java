@@ -30,7 +30,7 @@ public class CourseBaseInfoServiceTests {
 
         //分页参数对象
         PageParams pageParams = new PageParams();
-        pageParams.setPageNo(2L);
+        pageParams.setPageNo(1L);
         pageParams.setPageSize(2L);
 
         PageResult<CourseBase> courseBasePageResult = courseBaseInfoService.queryCourseBaseList(pageParams,queryCourseParamsDto);
