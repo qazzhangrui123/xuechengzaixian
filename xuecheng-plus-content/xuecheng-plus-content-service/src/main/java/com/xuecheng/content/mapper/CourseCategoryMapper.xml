@@ -17,7 +17,10 @@
     <sql id="Base_Column_List">
         id, name, label, parentid, is_show, orderby, is_leaf
     </sql>
-<!--    resultType模型类与数据库表中字段对应一致 resultMap 对应不一致-->
+<!--    resultType模型类与数据库表中字段对应一致 resultMap 对应不一致\
+#{}是标记一个占位符，防止sql注入
+${}用于在动态sql中拼接字符串，但可能导致sql注入
+-->
     <select id="selectTreeNodes" resultType="com.xuecheng.content.model.dto.CourseCategoryTreeDto" parameterType="string">
         with recursive t1 as (
             select * from  course_category p where  id= #{id}
