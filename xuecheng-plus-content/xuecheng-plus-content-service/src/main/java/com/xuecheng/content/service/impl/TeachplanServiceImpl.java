@@ -1,10 +1,13 @@
 package com.xuecheng.content.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.xuecheng.base.exception.XuechengPlusException;
 import com.xuecheng.content.mapper.TeachplanMapper;
+import com.xuecheng.content.mapper.TeachplanMediaMapper;
 import com.xuecheng.content.model.dto.SaveTeachplanDto;
 import com.xuecheng.content.model.dto.TeachplanDto;
 import com.xuecheng.content.model.po.Teachplan;
+import com.xuecheng.content.model.po.TeachplanMedia;
 import com.xuecheng.content.service.TeachplanService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +21,25 @@ public class TeachplanServiceImpl implements TeachplanService {
 
     @Autowired
     TeachplanMapper teachplanMapper;
+
+    @Autowired
+    TeachplanMediaMapper teachplanMediaMapper;
+
+    /**
+     * 根据id查询课程计划
+     * @param courseId  课程计划
+     * @return
+     */
     @Override
     public List<TeachplanDto> findTeachplanTree(Long courseId) {
         List<TeachplanDto> teachplanDtos = teachplanMapper.selectTreeNodes(courseId);
         return teachplanDtos;
     }
 
+    /**
+     * 新增/修改/保存课程计划
+     * @param saveTeachplanDto
+     */
     @Override
     public void saveTeachplan(SaveTeachplanDto saveTeachplanDto) {
         //通过课程计划id判断新增还是修改
@@ -47,11 +63,119 @@ public class TeachplanServiceImpl implements TeachplanService {
         }
     }
 
+    /**
+     * 删除课程计划
+     * @param courseId
+     */
+    @Override
+    public void delTeachplan(Long courseId) {
+        Teachplan teachplan = teachplanMapper.selectById(courseId);
+        List<TeachplanDto> teachplanDtos = teachplanMapper.selectTreeNodes(courseId);
+        if (teachplan.getParentid()==0&&teachplanDtos.size()==0){
+            //为大章节且大单节下没有小章节时可以正常删除
+            teachplanMapper.deleteById(courseId);
+        }else if (teachplan.getParentid()==0&&teachplanDtos.size()>0){
+            //删除大章节，大章节下有小章节时不允许删除
+            XuechengPlusException.cast("课程计划信息还有子级信息，无法操作");
+        }else if (teachplan.getParentid()!=0){
+            //删除小章节，同时将关联的信息进行删除
+            //获取关联信息
+            LambdaQueryWrapper<TeachplanMedia> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(TeachplanMedia::getTeachplanId,courseId);
+            //删除关联信息
+            teachplanMediaMapper.delete(queryWrapper);
+            //删除小章节
+            teachplanMapper.deleteById(courseId);
+        }
+    }
+
+    /**
+     * 课程计划下移
+     * @param courseId
+     */
+    @Override
+    public void movedownTeachplan(Long courseId) {
+        moveplan(courseId,false);
+    }
+
+    /**
+     * 课程计划上移
+     * @param courseId
+     */
+    @Override
+    public void moveupTeachplan(Long courseId) {
+        moveplan(courseId,true);
+    }
+
+    private void moveplan(Long courseId,Boolean UpOrDown){
+        //如果UpOrDown为false则为下移
+        //否则则为上移
+
+        //获取父节点的课程id
+        Teachplan teachplan = teachplanMapper.selectById(courseId);
+        Long parentid = teachplan.getParentid();
+        //查询所有的的课程计划
+        List<TeachplanDto> teachplanTree = teachplanMapper.selectTreeNodes(teachplan.getCourseId());
+        //判断是大章节移动还是小章节移动
+        if (parentid!=0){
+            //小章节移动
+            for (int i = 0; i < teachplanTree.size(); i++) {
+                TeachplanDto teachplanDto = teachplanTree.get(i);
+                if (teachplanDto.getId().equals(parentid)){
+                    teachplanTree = teachplanTree.get(i).getTeachPlanTreeNodes();
+                    break;
+                }
+            }
+        }
+        //获取当前计划的排序字段
+        Integer preorderby = teachplan.getOrderby();
+        //如果UpOrDown为false，则判断当前计划是否为最后一个
+        if (preorderby==teachplanTree.size()&&!UpOrDown){
+            //如果为最后一个则不变
+            XuechengPlusException.cast("当前计划已经为最后一个计划啦，没法再往下啦");
+        }else if (preorderby==1&&UpOrDown){
+            //如果UpOrDown为true，则判断当前计划是否为第一个
+            XuechengPlusException.cast("当前计划已经为第一个计划啦，没法再往上啦，你干嘛～～");
+        }else {
+            Teachplan teach;
+            int m=-1,temp=0;
+            if (!UpOrDown){
+                //否则，与其下一个计划进行交换
+                //获取到下一个计划
+                for (int i = 0; i < teachplanTree.size(); i++) {
+                    if (teachplanTree.get(i).getOrderby()>preorderby){
+                        if (m==-1||teachplanTree.get(i).getOrderby()<temp){
+                            m=i;
+                            temp = teachplanTree.get(i).getOrderby();
+                        }
+                    }
+                }
+            }else{
+                for (int i = 0; i < teachplanTree.size(); i++) {
+                    if (teachplanTree.get(i).getOrderby()<preorderby){
+                        if (m==-1||teachplanTree.get(i).getOrderby()>temp){
+                            m=i;
+                            temp = teachplanTree.get(i).getOrderby();
+                        }
+                    }
+                }
+            }
+            //交换排序字段
+            teach = teachplanTree.get(m);
+            teach.setOrderby(preorderby);
+            teachplan.setOrderby(temp);
+            teachplanMapper.updateById(teachplan);
+            teachplanMapper.updateById(teach);
+        }
+    }
+
     private int getTeachplanCount(Long parentid,Long courseId){
         LambdaQueryWrapper<Teachplan> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Teachplan::getCourseId,courseId).eq(Teachplan::getParentid,parentid);
         return teachplanMapper.selectCount(queryWrapper)+1;
     }
+
+
 
 }
 

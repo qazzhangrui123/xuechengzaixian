@@ -114,3 +114,11 @@ Content-Type: application/json
   "status" : null,
   "teachPlanId" : 240
 }
+
+
+### 删除课程计划
+DELETE {{content_host}}/content/teachplan/22
+
+
+### 查询教师信息
+GET {{content_host}}/content/courseTeacher/list/72
