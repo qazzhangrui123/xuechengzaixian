@@ -22,8 +22,8 @@ public class CourseBaseMapperTests {
 
     @Test
     public void testCourseBaseMapper(){
-//        CourseBase courseBase = courseBaseMapper.selectById(18);
-//        Assertions.assertNotNull(courseBase);
+        CourseBase courseBase = courseBaseMapper.selectById(18);
+        Assertions.assertNotNull(courseBase);
 
         //详细进行分页查询的单元测试
 

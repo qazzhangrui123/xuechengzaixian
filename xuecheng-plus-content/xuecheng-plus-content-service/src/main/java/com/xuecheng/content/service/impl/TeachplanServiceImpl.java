@@ -13,6 +13,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,11 +36,11 @@ public class TeachplanServiceImpl implements TeachplanService {
         List<TeachplanDto> teachplanDtos = teachplanMapper.selectTreeNodes(courseId);
         return teachplanDtos;
     }
-
     /**
      * 新增/修改/保存课程计划
      * @param saveTeachplanDto
      */
+    @Transactional
     @Override
     public void saveTeachplan(SaveTeachplanDto saveTeachplanDto) {
         //通过课程计划id判断新增还是修改
@@ -53,7 +54,9 @@ public class TeachplanServiceImpl implements TeachplanService {
             Long courseId = saveTeachplanDto.getCourseId();
             int count = getTeachplanCount(parentid,courseId);
             teachplan.setOrderby(count);
-            teachplanMapper.insert(teachplan);
+            int insert = teachplanMapper.insert(teachplan);
+            if (insert<=0)
+                XuechengPlusException.cast("插入失败");
         }else {
             //修改
             Teachplan teachplan = teachplanMapper.selectById(teachplanId);

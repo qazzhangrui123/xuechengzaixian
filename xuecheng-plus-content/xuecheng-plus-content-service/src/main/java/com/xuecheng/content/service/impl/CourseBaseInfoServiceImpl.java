@@ -5,17 +5,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xuecheng.base.exception.XuechengPlusException;
 import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
-import com.xuecheng.content.mapper.CourseBaseMapper;
-import com.xuecheng.content.mapper.CourseCategoryMapper;
-import com.xuecheng.content.mapper.CourseMarketMapper;
-import com.xuecheng.content.model.dto.AddCourseDto;
-import com.xuecheng.content.model.dto.CourseBaseInfoDto;
-import com.xuecheng.content.model.dto.EditCourseDto;
-import com.xuecheng.content.model.dto.QueryCourseParamsDto;
-import com.xuecheng.content.model.po.CourseBase;
-import com.xuecheng.content.model.po.CourseCategory;
-import com.xuecheng.content.model.po.CourseMarket;
+import com.xuecheng.content.mapper.*;
+import com.xuecheng.content.model.dto.*;
+import com.xuecheng.content.model.po.*;
 import com.xuecheng.content.service.CourseBaseInfoService;
+import com.xuecheng.content.service.CourseTeacherInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -39,6 +33,17 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
     @Autowired
     CourseCategoryMapper courseCategoryMapper;
 
+    @Autowired
+    CourseTeacherMapper courseTeacherMapper;
+
+    @Autowired
+    TeachplanMapper teachplanMapper;
+
+    @Autowired
+    TeachplanMediaMapper teachplanMediaMapper;
+
+    @Autowired
+    CourseTeacherInfoService courseTeacherInfoService;
     /**
      * 课程分页查询
      * @param pageParams
@@ -157,6 +162,12 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         return courseBaseInfoDto;
     }
 
+    /**
+     * 修改课程信息
+     * @param companyId 机构id
+     * @param editCourseDto 课程信息
+     * @return
+     */
     @Override
     public CourseBaseInfoDto updateCourseBase(Long companyId, EditCourseDto editCourseDto) {
         //拿到课程id
@@ -183,13 +194,67 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         //更新营销信息
         //查询营销信息
         CourseMarket courseMarket = courseMarketMapper.selectById(courseId);
-        BeanUtils.copyProperties(editCourseDto,courseMarket);
-        int aa = courseMarketMapper.updateById(courseMarket);
-        if (aa<=0)
-            XuechengPlusException.cast("修改营销信息失败");
+        if (courseMarket==null){
+            //如果营销信息不存在，创建营销信息
+            courseMarket = new CourseMarket();
+            BeanUtils.copyProperties(editCourseDto,courseMarket);
+            //插入营销信息
+            int a = courseMarketMapper.insert(courseMarket);
+            if (a<=0)
+                XuechengPlusException.cast("插入营销信息失败");
+        }else {
+            //否则修改营销信息
+            BeanUtils.copyProperties(editCourseDto,courseMarket);
+            int aa = courseMarketMapper.updateById(courseMarket);
+            if (aa<=0)
+                XuechengPlusException.cast("修改营销信息失败");
+        }
         //查询课程信息
         CourseBaseInfoDto courseBaseInfo = getCourseBaseInfo(courseId);
         return courseBaseInfo;
+    }
+
+    /**
+     * 删除课程信息
+     * @param courseId
+     */
+    @Override
+    public void delCourseBase(Long courseId) {
+        CourseBase courseBase = courseBaseMapper.selectById(courseId);
+        if (!courseBase.getAuditStatus().equals("202002"))
+            XuechengPlusException.cast("只有未提交状态才可以删除，懂了吗哥哥");
+        //删除课程教师信息
+        //查询出所有教师信息
+        List<CourseTeacher> courseTeacherInfo = courseTeacherInfoService.findCourseTeacherInfo(courseId);
+        for (int i = 0; i < courseTeacherInfo.size(); i++) {
+            courseTeacherMapper.deleteById(courseTeacherInfo.get(i).getId());
+        }
+        //删除课程计划
+        //获取课程计划列表
+        List<TeachplanDto> teachplanDtos = teachplanMapper.selectTreeNodes(courseId);
+        for (int i = 0; i < teachplanDtos.size(); i++) {
+            del(teachplanDtos.get(i));
+        }
+        //删除营销信息
+        courseMarketMapper.deleteById(courseId);
+        //删除基本信息
+        courseBaseMapper.deleteById(courseId);
+
+    }
+
+    /**
+     * 删除某一教学计划
+     * @param teachplanDto
+     */
+    private void del(TeachplanDto teachplanDto) {
+        if (teachplanDto.getTeachPlanTreeNodes()!=null){
+            for (int i = 0; i < teachplanDto.getTeachPlanTreeNodes().size(); i++) {
+                del(teachplanDto.getTeachPlanTreeNodes().get(i));
+            }
+        }
+        teachplanMapper.deleteById(teachplanDto.getId());
+        if (teachplanDto.getTeachplanMedia()!=null)
+            teachplanMediaMapper.deleteById(teachplanDto.getTeachplanMedia().getId());
     }
 
     //单独写一个方法，保存营销信息，逻辑：存在则更新，不存在则添加
