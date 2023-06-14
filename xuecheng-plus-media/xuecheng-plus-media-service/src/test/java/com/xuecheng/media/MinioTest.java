@@ -12,6 +12,10 @@ import org.springframework.util.DigestUtils;
 import java.io.*;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MinioTest {
 
@@ -78,4 +82,46 @@ public class MinioTest {
             throw new RuntimeException(e);
         }
     }
+
+    //将分块文件上传到minio
+    @Test
+    public void uploadChunk() throws Exception{
+        for (int i = 0; i < 4; i++) {
+            //上传文件的参数信息
+            UploadObjectArgs testbucket = UploadObjectArgs.builder()
+                    .bucket("testbucket")  //桶
+                    .object("chunk/"+i)
+                    .filename("/media/liulaoban/新加卷/chunk/"+i)   //指定本地文件路径
+                    .build();
+            minioClient.uploadObject(testbucket);
+            System.out.println("上传分块"+ i + "成功");
+        }
+
+    }
+    //调用minio接口合并分块
+    @Test
+    public void testMerge() throws Exception{
+//        List<ComposeSource> sources = new ArrayList<>();
+//        for (int i = 0; i < 2; i++) {
+//            //指定分块文件的信息
+//            ComposeSource testbucket = ComposeSource.builder().bucket("testbucket").object("chunk/" + i).build();
+//            sources.add(testbucket);
+//        }
+        List<ComposeSource> testbucket1 = Stream.iterate(0, i -> ++i).limit(4)
+                .map(i -> ComposeSource
+                        .builder()
+                        .bucket("testbucket")
+                        .object("chunk/" + i)
+                        .build())
+                .collect(Collectors.toList());
+
+        //指定合并后的objectname等信息
+        ComposeObjectArgs testbucket = ComposeObjectArgs.builder()
+                .bucket("testbucket")
+                .object("merge01.mp4")
+                .sources(testbucket1)   //指定源文件
+                .build();
+        minioClient.composeObject(testbucket);
+    }
+    //批量清理分块文件
 }
