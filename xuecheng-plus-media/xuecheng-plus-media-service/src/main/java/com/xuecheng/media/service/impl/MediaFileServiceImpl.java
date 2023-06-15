@@ -9,10 +9,12 @@ import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
 import com.xuecheng.base.model.RestResponse;
 import com.xuecheng.media.mapper.MediaFilesMapper;
+import com.xuecheng.media.mapper.MediaProcessMapper;
 import com.xuecheng.media.model.dto.QueryMediaParamsDto;
 import com.xuecheng.media.model.dto.UploadFileParamsDto;
 import com.xuecheng.media.model.dto.UploadFileResultDto;
 import com.xuecheng.media.model.po.MediaFiles;
+import com.xuecheng.media.model.po.MediaProcess;
 import com.xuecheng.media.service.MediaFileService;
 import io.minio.*;
 import io.minio.errors.*;
@@ -62,6 +64,9 @@ public class MediaFileServiceImpl implements MediaFileService {
     @Value("${minio.bucket.videofiles}")
     private String bucket_videofiles;
 
+
+    @Autowired
+    MediaProcessMapper mediaProcessMapper;
     @Autowired
     MediaFileService currentProxy;
 
@@ -187,7 +192,7 @@ public class MediaFileServiceImpl implements MediaFileService {
             //机构id
             mediaFiles.setCompanyId(companyId);
             //桶
-            mediaFiles.setBucket(bucket_mediafiles);
+            mediaFiles.setBucket(bucket);
             //file_path
             mediaFiles.setFilePath(objectName);
             //file_id
@@ -206,9 +211,41 @@ public class MediaFileServiceImpl implements MediaFileService {
                 log.debug("向数据库保存文件失败，bucket:{},objectName:{}",bucket,objectName);
                 return null;
             }
+            //记录待处理任务
+
+            addWaitingTask(mediaFiles);
+            //向MediaProcess插入记录
+
             return mediaFiles;
         }
         return mediaFiles;
+    }
+
+
+    /**
+     * 添加待处理任务
+     * @param mediaFiles 媒资文件信息
+     */
+    private void addWaitingTask(MediaFiles mediaFiles){
+        //获取mimeType
+        //文件名称
+        String filename = mediaFiles.getFilename();
+        //文件扩展名
+        String extension = filename.substring(filename.lastIndexOf("."));
+        String mimeType = getMimeType(extension);
+        //通过mimeType 判断如果是avi视频，写入待处理任务
+        if (mimeType.equals("video/x-msvideo")){
+            //如果是avi视频，写入待处理任务
+            MediaProcess mediaProcess = new MediaProcess();
+            BeanUtils.copyProperties(mediaFiles,mediaProcess);
+            //状态为未处理
+            mediaProcess.setStatus("1");
+            mediaProcess.setCreateDate(LocalDateTime.now());
+            mediaProcess.setFailCount(0);  //失败次数，默认为0
+            mediaProcess.setUrl(null);
+            mediaProcessMapper.insert(mediaProcess);
+        }
+
     }
 
     //检查目标文件是否已在minio中

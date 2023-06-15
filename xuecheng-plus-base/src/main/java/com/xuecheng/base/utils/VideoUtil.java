@@ -57,8 +57,11 @@ public class VideoUtil {
             int start = outstring.trim().indexOf("Duration: ");
             if(start>=0){
                 int end = outstring.trim().indexOf(", bitrate:");
+                int a=10;
+                if (end-start>25)
+                    end=start+21;
                 if(end>=0){
-                    String time = outstring.substring(start+10,end);
+                    String time = outstring.substring(start+a,end);
                     if(time!=null && !time.equals("")){
                         return time.trim();
                     }
