@@ -39,4 +39,6 @@ public interface TeachplanService {
      * @param courseId
      */
     public void moveupTeachplan(Long courseId);
+
+
 }

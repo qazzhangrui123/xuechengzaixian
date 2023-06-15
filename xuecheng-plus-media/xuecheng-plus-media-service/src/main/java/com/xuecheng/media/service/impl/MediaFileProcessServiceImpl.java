@@ -70,7 +70,7 @@ public class MediaFileProcessServiceImpl implements MediaFileProcessService {
         //更新MediaProcess表的状态
         mediaProcess.setStatus("2");
         mediaProcess.setFinishDate(LocalDateTime.now());
-        mediaFiles.setUrl(url);
+        mediaProcess.setUrl(url);
         mediaProcessMapper.updateById(mediaProcess);
 
         //将MediaProcess表记录插入到MediaProcessHistory表
