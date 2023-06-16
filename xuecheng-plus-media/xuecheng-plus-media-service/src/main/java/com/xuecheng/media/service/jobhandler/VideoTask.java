@@ -113,15 +113,15 @@ public class VideoTask {
                         mediaFileProcessService.saveProcessFinishStatus(taskid, "3", fileId, null, "视频转码失败");
                         return;
                     }
+                    //mp4文件的url
+                    String filePathByMd5 = getFilePathByMd5(fileId, ".mp4");
                     //上传到minio
-                    boolean b = mediaFileService.addMediaFilesToMinIO(mp4_path, "video/mp4", bucket, objectName);
+                    boolean b = mediaFileService.addMediaFilesToMinIO(mp4_path, "video/mp4", bucket, filePathByMd5);
                     if (!b) {
                         log.debug("上传mp4到minio失败");
                         mediaFileProcessService.saveProcessFinishStatus(taskid, "3", fileId, null, "上传mp4到minio失败");
                         return;
                     }
-                    //mp4文件的url
-                    String filePathByMd5 = getFilePathByMd5(fileId, ".mp4");
                     //保存任务处理成功的结果
                     mediaFileProcessService.saveProcessFinishStatus(taskid, "2", fileId, filePathByMd5, "下载视频到本地失败");
 

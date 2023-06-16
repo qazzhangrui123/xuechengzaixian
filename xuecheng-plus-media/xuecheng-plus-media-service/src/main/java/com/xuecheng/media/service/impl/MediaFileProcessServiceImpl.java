@@ -59,12 +59,17 @@ public class MediaFileProcessServiceImpl implements MediaFileProcessService {
 //            mediaProcessMapper.update();
             return;
         }
-
+        String oldFilename = mediaProcess.getFilename();
+        String NewFilename = oldFilename.substring(0, oldFilename.lastIndexOf(".") + 1)+"mp4";
         //========如果任务执行成功
         //文件表的记录
         MediaFiles mediaFiles = mediaFilesMapper.selectById(fileId);
+
+        url = "/video/" + url;
+
         //更新media_files表中的url
         mediaFiles.setUrl(url);
+        mediaFiles.setFilename(NewFilename);
         mediaFilesMapper.updateById(mediaFiles);
 
         //更新MediaProcess表的状态

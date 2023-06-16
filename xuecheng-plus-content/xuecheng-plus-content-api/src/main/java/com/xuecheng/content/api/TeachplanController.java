@@ -53,6 +53,6 @@ public class TeachplanController {
     @ApiOperation(value = "课程计划和媒资信息绑定")
     @PostMapping("/teachplan/association/media")
     public void associationMedia(@RequestBody BindTeachplanMediaDto bindTeachplanMediaDto){
-
+        teachplanService.associationMedia(bindTeachplanMediaDto);
     }
 }

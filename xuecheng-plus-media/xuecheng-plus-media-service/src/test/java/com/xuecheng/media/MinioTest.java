@@ -22,7 +22,7 @@ public class MinioTest {
     MinioClient minioClient =
             MinioClient.builder()
                     .endpoint("http://172.21.228.122:9000")
-                    .credentials("minio", "12345678")
+                    .credentials("minioadmin", "minioadmin")
                     .build();
     //上传
     @Test
@@ -39,9 +39,9 @@ public class MinioTest {
             UploadObjectArgs testbucket = UploadObjectArgs.builder()
                     .bucket("testbucket")  //桶
 //                    .object("triple.js")   //对象名,在桶下存储文件
-                    .object("test/triple.js")
+                    .object("test/greeting.js")
                     .contentType(mimeType)   //设置媒体文件类型
-                    .filename("/home/liulaoban/triple.js")   //指定本地文件路径
+                    .filename("/home/liulaoban/greeting.js")   //指定本地文件路径
                     .build();
             //上传文件
             minioClient.uploadObject(testbucket);
