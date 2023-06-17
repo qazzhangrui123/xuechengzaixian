@@ -23,6 +23,7 @@ import io.minio.messages.DeleteObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -141,7 +142,7 @@ public class MediaFileServiceImpl implements MediaFileService {
 
 
     @Override
-    public UploadFileResultDto uploadFile(Long companyId, UploadFileParamsDto uploadFileParamsDto, String LocalFilePath) {
+    public UploadFileResultDto uploadFile(Long companyId, UploadFileParamsDto uploadFileParamsDto, String LocalFilePath,String objectName) {
         //文件名
         String filename = uploadFileParamsDto.getFilename();
         //扩展名
@@ -152,19 +153,20 @@ public class MediaFileServiceImpl implements MediaFileService {
         String defaultFolderPath = getDefaultFolderPath();
         //文件的md5值
         String fileMd5 = getFileMd5(new File(LocalFilePath));
-        String ObjectName = defaultFolderPath+fileMd5+extension;
-
+        if (StringUtils.isEmpty(objectName))
+            //使用默认年月日存储
+            objectName = defaultFolderPath+fileMd5+extension;
 
         //上传文件的参数信息
         //上传文件到minio
-        boolean result = addMediaFilesToMinIO(LocalFilePath, mimeType, bucket_mediafiles, ObjectName);
+        boolean result = addMediaFilesToMinIO(LocalFilePath, mimeType, bucket_mediafiles, objectName);
         if (!result)
             XuechengPlusException.cast("上传文件失败");
 
 
         //将文件信息保存到数据库
         //入库文件信息
-        MediaFiles mediaFiles = currentProxy.addMediaFilesToDb(companyId, fileMd5, uploadFileParamsDto, bucket_mediafiles, ObjectName);
+        MediaFiles mediaFiles = currentProxy.addMediaFilesToDb(companyId, fileMd5, uploadFileParamsDto, bucket_mediafiles, objectName);
         if (mediaFiles==null)
             XuechengPlusException.cast("文件上传后保存信息失败");
 

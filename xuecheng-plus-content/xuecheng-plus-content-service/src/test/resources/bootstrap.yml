@@ -1,13 +1,29 @@
 #微服务配置
 spring:
   application:
-    name: content-service
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/xc_content?serverTimezone=UTC&userUnicode=true&useSSL=false
-    username: root
-    password: 123456
+    name: content-service  #服务名   content-api-dev.yaml配置文件
+  cloud:
+    nacos:
+      server-addr: localhost:8848
+      discovery:
+        namespace: ffc9bc20-1e11-4dd3-be86-71e0b80df76a
+        group: xuecheng-plus-project
+      config:   #配置文件相关信息
+        namespace: ffc9bc20-1e11-4dd3-be86-71e0b80df76a
+        group: xuecheng-plus-project
+        file-extension: yaml
+        refresh-enabled: true
+        shared-configs:
+          - data-id: feign-${spring.profiles.active}.yaml
+            group: xuecheng-plus-common
+            refresh: true
+  #  datasource:
+  #    driver-class-name: com.mysql.cj.jdbc.Driver
+  #    url: jdbc:mysql://localhost:3306/xc_content?serverTimezone=UTC&userUnicode=true&useSSL=false
+  #    username: root
+  #    password: 123456
+  profiles:
+    active: dev  #环境名
 # 日志文件配置路径
 logging:
   config: classpath:log4j2-dev.xml
-
