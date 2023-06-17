@@ -1,6 +1,6 @@
 package com.xuecheng.search.controller;
 
-import com.xuecheng.base.exception.XueChengPlusException;
+import com.xuecheng.base.exception.XuechengPlusException;
 import com.xuecheng.search.po.CourseIndex;
 import com.xuecheng.search.service.IndexService;
 import io.swagger.annotations.Api;
@@ -35,11 +35,11 @@ public class CourseIndexController {
 
         Long id = courseIndex.getId();
         if(id==null){
-            XueChengPlusException.cast("课程id为空");
+            XuechengPlusException.cast("课程id为空");
         }
         Boolean result = indexService.addCourseIndex(courseIndexStore, String.valueOf(id), courseIndex);
         if(!result){
-            XueChengPlusException.cast("添加课程索引失败");
+            XuechengPlusException.cast("添加课程索引失败");
         }
         return result;
 
