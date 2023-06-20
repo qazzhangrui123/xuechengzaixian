@@ -46,12 +46,13 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
     CourseTeacherInfoService courseTeacherInfoService;
     /**
      * 课程分页查询
+     * @param companyId 机构id
      * @param pageParams
      * @param queryCourseParamsDto
      * @return
      */
     @Override
-    public PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto) {
+    public PageResult<CourseBase> queryCourseBaseList(Long companyId,PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto) {
 
         //拼装查询条件
         LambdaQueryWrapper<CourseBase> queryWrapper = new LambdaQueryWrapper<>();
@@ -59,6 +60,8 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         queryWrapper.like(StringUtils.isNotEmpty(queryCourseParamsDto.getCourseName()),CourseBase::getName,queryCourseParamsDto.getCourseName());
         //根据课程的审核状态查询 course_base.audit_status = ?
         queryWrapper.eq(StringUtils.isNotEmpty(queryCourseParamsDto.getAuditStatus()), CourseBase::getAuditStatus, queryCourseParamsDto.getAuditStatus());
+        //根据机构id拼装查询条件
+        queryWrapper.eq(CourseBase::getCompanyId,companyId);
 
         //创建page分页参数对象，参数：当前页码，每页记录数
         Page<CourseBase> page = new Page<>(pageParams.getPageNo(),pageParams.getPageSize());

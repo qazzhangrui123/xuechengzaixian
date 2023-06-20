@@ -1,6 +1,7 @@
 package com.xuecheng.content.api;
 
 import com.xuecheng.content.model.dto.CoursePreviewDto;
+import com.xuecheng.content.model.po.CoursePublish;
 import com.xuecheng.content.service.CoursePublishService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +16,6 @@ import org.springframework.web.servlet.ModelAndView;
 public class CoursePublishController {
     @Autowired
     CoursePublishService coursePublishService;
-
-
-
     @GetMapping("/coursepreview/{courseId}")
     public ModelAndView preview(@PathVariable("courseId") Long courseId){
         ModelAndView modelAndView = new ModelAndView();
@@ -45,5 +43,13 @@ public class CoursePublishController {
         //机构id，由于认证系统没有上线暂时硬编码
         Long companyId = 1232141425L;
         coursePublishService.publish(companyId,courseId);
+    }
+
+    @ApiOperation("查询课程发布信息")
+    @ResponseBody
+    @GetMapping ("/r/coursepublish/{courseId}")
+    public CoursePublish getCoursepublish(@PathVariable("courseId") Long courseId){
+        CoursePublish coursePublish = coursePublishService.getCoursePublish(courseId);
+        return coursePublish;
     }
 }

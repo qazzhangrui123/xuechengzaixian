@@ -1,0 +1,5 @@
+### 申请验证码
+POST {{checkcode_host}}/checkcode/pic
+
+### 校验验证码
+POST {{checkcode_host}}/checkcode/verify?key=checkcode:55e887f40e4e4917a048e202da2df17a&code=JPSC

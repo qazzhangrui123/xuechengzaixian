@@ -244,4 +244,14 @@ public class CoursePublishServiceImpl implements CoursePublishService {
             XuechengPlusException.cast(CommonError.UNKOWN_ERROR);
         }
     }
+
+    /**
+     * 根据课程id查询课程发布信息
+     * @param courseId
+     * @return
+     */
+    public CoursePublish getCoursePublish(Long courseId){
+        CoursePublish coursePublish = coursePublishMapper.selectById(courseId);
+        return coursePublish ;
+    }
 }
