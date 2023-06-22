@@ -178,11 +178,11 @@
                             <div class="item">
                                 <div class="title act"><i class="i-chevron-top"></i>${firstNode.pname}<span class="time">x小时</span></div>
                                 <div class="drop-down" style="height: 260px;">
-<#--                                    <ul class="list-box">-->
-<#--                                        <#list firstNode.teachPlanTreeNodes as secondNode>-->
-<#--                                            <li><a href="http://www.51xuecheng.cn/course/preview/learning.html?id=${model.courseBase.id}&chapter=${secondNode.teachplanMedia.teachplanId!''}" target="_blank">${secondNode.pname}</a></li>-->
-<#--                                        </#list>-->
-<#--                                    </ul>-->
+                                    <ul class="list-box">
+                                        <#list firstNode.teachPlanTreeNodes as secondNode>
+                                            <li><a href="http://www.51xuecheng.cn/course/preview/learning.html?id=${model.courseBase.id}&chapter=${secondNode.teachplanMedia.teachplanId!''}" target="_blank">${secondNode.pname}</a></li>
+                                        </#list>
+                                    </ul>
                                 </div>
                             </div>
                         </#list>

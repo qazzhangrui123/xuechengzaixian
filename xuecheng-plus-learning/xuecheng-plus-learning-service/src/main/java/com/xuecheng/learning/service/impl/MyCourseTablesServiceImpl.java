@@ -1,11 +1,14 @@
 package com.xuecheng.learning.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xuecheng.base.exception.XuechengPlusException;
+import com.xuecheng.base.model.PageResult;
 import com.xuecheng.content.model.po.CoursePublish;
 import com.xuecheng.learning.feignclient.ContentServiceClient;
 import com.xuecheng.learning.mapper.XcChooseCourseMapper;
 import com.xuecheng.learning.mapper.XcCourseTablesMapper;
+import com.xuecheng.learning.model.dto.MyCourseTableParams;
 import com.xuecheng.learning.model.dto.XcChooseCourseDto;
 import com.xuecheng.learning.model.dto.XcCourseTablesDto;
 import com.xuecheng.learning.model.po.XcChooseCourse;
@@ -86,6 +89,52 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
             return xcCourseTablesDto;
         }
 
+    }
+
+    @Override
+    public boolean saveChooseCourseStauts(String chooseCourseId) {
+        //根据选课id查询选课表
+        XcChooseCourse xcChooseCourse = xcChooseCourseMapper.selectById(chooseCourseId);
+        if (xcChooseCourse==null){
+            log.debug("接收购买课程的消息，根据选课id从数据库找不到选课记录.选课id：{}",chooseCourseId);
+            return false;
+        }
+        //选课状态
+        String status = xcChooseCourse.getStatus();
+        //只有当未支付时才更新为已支付
+        if (status.equals("701002")){
+            //更新选课记录的状态为支付成功
+            xcChooseCourse.setStatus("701001");
+            int update = xcChooseCourseMapper.updateById(xcChooseCourse);
+            if (update<=0){
+                log.debug("添加选课记录失败:{}",xcChooseCourse);
+                XuechengPlusException.cast("添加选课记录失败");
+            }
+            //向我的课程表插入记录
+            XcCourseTables xcCourseTables = addCourseTabls(xcChooseCourse);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public PageResult<XcCourseTables> mycourestables(MyCourseTableParams params) {
+        //用户id
+        String userId = params.getUserId();
+        //当前页码
+        int pageNo = params.getPage();
+        //每页记录数
+        int size = params.getSize();
+        Page<XcCourseTables> xcCourseTablesPage = new Page<>(pageNo,size);
+        LambdaQueryWrapper<XcCourseTables> lambdaQueryWrapper = new LambdaQueryWrapper<XcCourseTables>().eq(XcCourseTables::getUserId, userId);
+        //查询数据
+        Page<XcCourseTables> result = xcCourseTablesMapper.selectPage(xcCourseTablesPage, lambdaQueryWrapper);
+        //数据列表
+        List<XcCourseTables> records = result.getRecords();
+        long total = result.getTotal();
+        //List<T> items, long counts, long page, long pageSize
+        PageResult xcCourseTablesPageResult = new PageResult(records,total,pageNo,size);
+        return xcCourseTablesPageResult;
     }
 
     //添加免费课程,免费课程加入选课记录表、我的课程表
