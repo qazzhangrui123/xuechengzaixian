@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiaodaidai.content.mapper.CourseCategoryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xiaodaidai.content.model.po.CourseCategory">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="label" property="label" />
+        <result column="parentid" property="parentid" />
+        <result column="is_show" property="isShow" />
+        <result column="orderby" property="orderby" />
+        <result column="is_leaf" property="isLeaf" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, label, parentid, is_show, orderby, is_leaf
+    </sql>
+<!--    resultType模型类与数据库表中字段对应一致 resultMap 对应不一致\
+#{}是标记一个占位符，防止sql注入
+${}用于在动态sql中拼接字符串，但可能导致sql注入
+-->
+    <select id="selectTreeNodes" resultType="com.xiaodaidai.content.model.dto.CourseCategoryTreeDto" parameterType="string">
+        with recursive t1 as (
+            select * from  course_category p where  id= #{id}
+            union all
+            select t.* from course_category t inner join t1 on t1.id = t.parentid
+        )
+        select *  from t1 order by t1.id, t1.orderby
+
+    </select>
+
+</mapper>
