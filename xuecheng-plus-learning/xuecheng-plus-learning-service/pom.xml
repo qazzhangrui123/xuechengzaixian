@@ -32,11 +32,6 @@
             <artifactId>xuecheng-plus-learning-model</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.xuecheng</groupId>-->
-<!--            <artifactId>xuecheng-plus-content-model</artifactId>-->
-<!--            <version>0.0.1-SNAPSHOT</version>-->
-<!--        </dependency>-->
         <!-- MySQL 驱动 -->
         <dependency>
             <groupId>mysql</groupId>

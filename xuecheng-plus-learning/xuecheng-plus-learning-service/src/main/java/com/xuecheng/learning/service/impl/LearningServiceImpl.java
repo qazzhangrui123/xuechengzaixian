@@ -1,8 +1,8 @@
 package com.xuecheng.learning.service.impl;
 
 import com.xuecheng.base.model.RestResponse;
-import com.xuecheng.content.model.po.CoursePublish;
 import com.xuecheng.learning.feignclient.ContentServiceClient;
+import com.xuecheng.learning.feignclient.CoursePublish;
 import com.xuecheng.learning.feignclient.MediaServiceClient;
 import com.xuecheng.learning.model.dto.XcCourseTablesDto;
 import com.xuecheng.learning.service.LearningService;

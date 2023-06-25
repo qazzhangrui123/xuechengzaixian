@@ -31,6 +31,8 @@ public class CoursePublishController {
         CoursePreviewDto coursePreviewDto = new CoursePreviewDto();
         //查询课程发布表
         CoursePublish coursePublish = coursePublishService.getCoursePublish(courseId);
+        //先从缓存查询，缓存中有直接返回，没有查询数据库
+//        CoursePublish coursePublish = coursePublishService.getCoursePublishCache(courseId);
         if (coursePublish==null){
             return coursePreviewDto;
         }

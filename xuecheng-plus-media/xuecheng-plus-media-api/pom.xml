@@ -12,6 +12,11 @@
     <description>xuecheng-plus-media-api</description>
 
     <dependencies>
+        <dependency>
+            <groupId>com.spotify</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <version>1.2.2</version>
+        </dependency>
         <!--根据扩展名取mimetype-->
         <dependency>
             <groupId>com.j256.simplemagic</groupId>

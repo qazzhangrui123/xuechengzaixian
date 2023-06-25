@@ -1,6 +1,5 @@
 package com.xuecheng.learning.feignclient;
 
-import com.xuecheng.content.model.po.CoursePublish;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

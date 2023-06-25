@@ -1,0 +1,2 @@
+### 查询课程信息
+POST {{work_host}}/teaching/work/list?pageNo=1&pageSize=2

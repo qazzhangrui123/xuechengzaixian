@@ -21,6 +21,7 @@
         <module>../xuecheng-plus-message-sdk</module>
         <module>../xuecheng-plus-search</module>
         <module>../xuecheng-plus-system</module>
+        <module>../xuecheng-plus-work</module>
     </modules>
 
     <properties>

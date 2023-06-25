@@ -33,7 +33,8 @@ public class ContentCodeGenerator {
 			 "course_teacher",
 			"course_category",
 			 "course_publish",
-			 "course_publish_pre"
+			 "course_publish_pre",
+			"work"
 
 	};
 
